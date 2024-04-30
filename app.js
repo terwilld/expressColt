@@ -27,16 +27,25 @@ const userRoutes = require('./routes/users.js');
 
 
 require('dotenv').config()
-let dbURL = process.env.dbURL
-// console.log(dbURL)
+let dbURL, secret
+console.log(`This is node running in ${process.env.NODE_ENV} mode`)
+if (process.env.NODE_ENV == "production") {
+    dbURL = process.env.dbURL
+    secret = process.env.secret
+} else {
+    dbURL = 'mongodb://127.0.0.1:27017/yelp-camp'
+    secret = 'secret'
+}
 
+console.log(dbURL)
+console.log('pre connect')
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config()
 }
 
 
 //Comment out to connect to atlas
-dbURL = 'mongodb://127.0.0.1:27017/yelp-camp'
+// dbURL = 'mongodb://127.0.0.1:27017/yelp-camp'
 mongoose.connect(dbURL);
 // mongoose.connect(dbURL);
 
@@ -78,14 +87,14 @@ const store = MongoStore.create({
     mongoUrl: dbURL,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret:'thisismysecret'
+        secret: secret
     }
 })
 
 
 const sessionConfig = {
     name : 'myfancycoookiename',
-    secret: 'thisisabadsecret',
+    secret: secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
